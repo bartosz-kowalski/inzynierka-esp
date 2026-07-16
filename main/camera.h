@@ -91,19 +91,19 @@ void camera_task(void *pvParameters){
     cameraTaskParams *params = (cameraTaskParams*)pvParameters;
     while (1)
     {
-        uint8_t inactive = params->active == 1 ? 0 : 1; 
         camera_fb_t *fb = esp_camera_fb_get();
 
-        //xSemaphoreTake(params->mutex, portMAX_DELAY);
-        memcpy(params->frame[inactive], fb->buf, fb->len); 
+        xSemaphoreTake(params->mutex, portMAX_DELAY);       // blocking server_task from sending frames which will now be replaced
+        uint8_t inactive = params->active == 1 ? 0 : 1;     // choosing the now-inactive buffer
 
-        xSemaphoreTake(params->mutex, portMAX_DELAY);
-        params->frameLen[inactive] = fb->len;
-        params->active = inactive;
+        memcpy(params->frame[inactive], fb->buf, fb->len);  // described in "definitions.h"
+
+        params->frameLen[inactive] = fb->len;               // described in "definitions.h"
+        params->active = inactive;                          // activating the other buffer
         xSemaphoreGive(params->mutex);
 
         esp_camera_fb_return(fb);
-        vTaskDelay(pdMS_TO_TICKS(50));
+        vTaskDelay(pdMS_TO_TICKS(100));
     }
 }
 

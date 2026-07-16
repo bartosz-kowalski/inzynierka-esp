@@ -8,10 +8,9 @@
 void control_task(void *pvParameters){
 
     controlTaskParams *params = (controlTaskParams*)pvParameters;
-    uint8_t ignoreRPi = 0;
 
     while(1){
-        if(eStop == 1){
+        if(eStop == 1){ // flag set by sensor_task
             // hover in place
         }
         else{

@@ -17,15 +17,16 @@ extern "C" void app_main(void)
 {
 
     uint8_t *frameBuf[2];
-    frameBuf[0] = (uint8_t*)heap_caps_malloc(1024 * 1024, MALLOC_CAP_SPIRAM);
+    frameBuf[0] = (uint8_t*)heap_caps_malloc(1024 * 1024, MALLOC_CAP_SPIRAM);   // memory allocation for framebuffers (1 MB each)
     frameBuf[1] = (uint8_t*)heap_caps_malloc(1024 * 1024, MALLOC_CAP_SPIRAM);
+
     SemaphoreHandle_t frameMutex = xSemaphoreCreateMutex();
     SemaphoreHandle_t sensorMutex = xSemaphoreCreateMutex();
 
     static cameraTaskParams camParams = {
         .frame = { frameBuf[0], frameBuf[1] },
         .frameLen = { 0, 0 },
-        .active = 0,
+        .active = 1,
         .mutex = frameMutex
     };
 
@@ -38,8 +39,8 @@ extern "C" void app_main(void)
     static controlTaskParams ctrlParams = {};
 
     static serverTaskParams serverParams = {
-        .cmr = camParams,
-        .ctrl = ctrlParams
+        .cmr = &camParams,
+        .ctrl = &ctrlParams
     };
 
     ESP_ERROR_CHECK(wifi_init());
@@ -48,6 +49,6 @@ extern "C" void app_main(void)
     ESP_ERROR_CHECK(sensor_init());
     
     xTaskCreatePinnedToCore(camera_task, "camera_task", 4096, &camParams, 4, NULL, CORE_0); //camera capture task
-    xTaskCreate(sensor_task, "sensor_task", 3072, &sensorParams, 2, NULL); // ultrasonic range sensor task (TOP PRIORITY)
-    xTaskCreatePinnedToCore(control_task, "control_task", 4096, NULL, 1, &controlTaskHandle, CORE_0); // drone communication task
+    xTaskCreate(sensor_task, "sensor_task", 3072, &sensorParams, 2, NULL); // ultrasonic range sensor task
+    xTaskCreatePinnedToCore(control_task, "control_task", 4096, NULL, 1, NULL, CORE_0); // drone communication task
 }

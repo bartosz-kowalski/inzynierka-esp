@@ -16,16 +16,16 @@ static esp_err_t frame_get_handler(httpd_req_t *req)
 {
     cameraTaskParams *params = (cameraTaskParams *)req->user_ctx;
 
-    xSemaphoreTake(params->mutex, portMAX_DELAY);
+    xSemaphoreTake(params->mutex, portMAX_DELAY);   // blocking the camera_task form altering images during http request service
 
-    uint8_t active = params->active;
-    uint8_t *buf = params->frame[active];
-    size_t len = params->frameLen[active];
-
-    xSemaphoreGive(params->mutex);
+    uint8_t active = params->active;        // described in "definitions.h"
+    uint8_t *buf = params->frame[active];   
+    size_t len = params->frameLen[active];  
 
     httpd_resp_set_type(req, "image/jpeg");
     httpd_resp_send(req, (char *)buf, len);
+
+    xSemaphoreGive(params->mutex); 
 
     return ESP_OK;
 }
@@ -64,14 +64,14 @@ static httpd_uri_t uri_post = {
 
 static esp_err_t server_init(serverTaskParams *params){
 
-    httpd_config_t config = HTTPD_DEFAULT_CONFIG();
+    httpd_config_t config = HTTPD_DEFAULT_CONFIG();    
 
-    uri_get.user_ctx = &(params->cmr);
-    uri_post.user_ctx = &(params->ctrl);
+    uri_get.user_ctx = params->cmr;
+    uri_post.user_ctx = params->ctrl;
 
     config.core_id = 1;
     config.task_priority = 3;
-    config.server_port = HTTP_PORT;
+    config.server_port = HTTP_PORT;     // user may change the port no if needed
     config.stack_size = 8192;
 
     if (httpd_start(&server, &config) == ESP_OK) {

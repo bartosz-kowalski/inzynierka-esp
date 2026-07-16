@@ -1,4 +1,3 @@
-
 [submodule "external_components/vl53l0x-esp-idf"]
 	path = external_components/vl53l0x-esp-idf
 	url = https://github.com/bartosz-kowalski/vl53l0x-esp-idf.git
