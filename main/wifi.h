@@ -3,8 +3,10 @@
 
 #define DEBUG
 
+
 #include "esp_wifi.h"
 #include "nvs_flash.h"
+#include "esp_log.h"
 
 #define WIFI_TAG "WIFI"
 
@@ -28,12 +30,12 @@ static esp_err_t wifi_init(){
     wifi_config_t ap_config = {
         .ap = {
             .ssid = AP_SSID,
-            .ssid_len = strlen(AP_SSID),
             .password = AP_PASSWORD,
-            .channel = 6,
-            .max_connection = 3,
-            .authmode = WIFI_AUTH_WPA2_PSK
-        }
+            .ssid_len = strlen(AP_SSID),
+            .channel = 0,
+            .authmode = WIFI_AUTH_WPA2_PSK,
+            .max_connection = 2,
+        },
     };
 
     ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_AP));
