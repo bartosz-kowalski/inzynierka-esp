@@ -3,6 +3,8 @@
 
 #include "definitions.h"
 
+#include "mavlink.h"
+
 #define CONTROL_TAG "CONTROL_SYSTEM"
 
 void control_task(void *pvParameters){

@@ -68,7 +68,7 @@ void sensor_task(void *pvParameters){
             else if(tooClose == 1 && currentVal >= 1000){
                 tooClose = 0;
                 eStop = 0;  // global flag; notifying control_task to stop ignoring all movement instructions
-                ESP_LOGI(SENSOR_TAG, "Target far enough to go. Distance: %d mm", currentVal);
+                ESP_LOGI(SENSOR_TAG, "Target at safe distance. Distance: %d mm", currentVal);
             }
         }
 
